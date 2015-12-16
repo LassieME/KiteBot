@@ -9,17 +9,13 @@ namespace KiteBot
 	{
 		public static string[] _kiteDunks;
 		public static Random _randomSeed;
-        public const string FileLocation = @"C:\Users\sindr\Documents\visual studio 2013\Projects\ConsoleApplication1\ConsoleApplication1\KiteDunks3.txt";
+        public const string FileLocation = @"C:\Users\Michael\Documents\ProgrammingProjects\KiteBot\ConsoleApplication1\KiteDunks3.txt";
         public const string GoogleSpreadsheetApiUrl = "https://spreadsheets.google.com/feeds/list/11024r_0u5Mu-dLFd-R9lt8VzOYXWgKX1I5JamHJd8S4/od6/public/values?hl=en_US&&alt=json";
 
-        public KiteDunk() : this(File.ReadAllLines(FileLocation), new Random(DateTime.Now.Millisecond))
+        public KiteDunk(string fileLocation)
         {
-        }
-
-        public KiteDunk(string[] arrayOfDunks, Random randomSeed)
-        {
-            _kiteDunks = arrayOfDunks;
-            _randomSeed = randomSeed;
+            _kiteDunks = File.ReadAllLines(fileLocation);
+            _randomSeed = new Random(DateTime.Now.Millisecond);
         }
 
         /// <summary>

@@ -6,10 +6,20 @@ namespace KiteBot
     {
 		public static Discord.DiscordClient Client;
 
+        /// <summary>
+        /// Entry point for kite bot.
+        /// </summary>
+        /// <param name="args">user supplied email, password, and location of kiteDunks3 in order</param>
 		static void Main(string[] args)
         {
+            //checks to see if email, password, and file location are supplied
+		    if (args.Length != 3)
+		    {
+		        Console.WriteLine("Please supply email, password, and file location as arugments");
+                return;
+		    }
             Client = new Discord.DiscordClient();
-			var kiteDunk = new KiteBot.KiteDunk();
+			var kiteDunk = new KiteBot.KiteDunk(args[2]);
 
 			//Display all log messages in the console
 			Client.LogMessage += (s, e) => Console.WriteLine("[{"+e.Severity+"}] {"+e.Source+"}: {"+e.Message+"}");
@@ -58,7 +68,7 @@ namespace KiteBot
 			Client.Run(async () =>
 			{
 				//Connect to the Discord server using our email and password
-				await Client.Connect("", "");
+				await Client.Connect(args[0], args[1]);
 			});
         }
     }

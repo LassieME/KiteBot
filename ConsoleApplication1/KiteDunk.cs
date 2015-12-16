@@ -9,7 +9,6 @@ namespace KiteBot
 	{
 		public static string[] _kiteDunks;
 		public static Random _randomSeed;
-        public const string FileLocation = @"C:\Users\Michael\Documents\ProgrammingProjects\KiteBot\ConsoleApplication1\KiteDunks3.txt";
         public const string GoogleSpreadsheetApiUrl = "https://spreadsheets.google.com/feeds/list/11024r_0u5Mu-dLFd-R9lt8VzOYXWgKX1I5JamHJd8S4/od6/public/values?hl=en_US&&alt=json";
 
         public KiteDunk(string fileLocation)

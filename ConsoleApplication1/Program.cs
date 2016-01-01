@@ -12,6 +12,7 @@ namespace KiteBot
         {
             Client = new DiscordClient();
 			var kiteDunk = new KiteDunk();
+			var kiteChat = new KiteChat();
 			var giantBombRss = new GiantBombRss();
 			bool shutUp = false;
 
@@ -70,7 +71,7 @@ namespace KiteBot
 					}
 					else
 					{
-						await Client.SendMessage(e.Channel, "KiteBot ver. 0.6 \"Ask for the special sauce.\"");
+						await Client.SendMessage(e.Channel, kiteChat.ParseChatResponse(e.Message.User.Name, e.Message.Text ));
 					}
 				}
 			};

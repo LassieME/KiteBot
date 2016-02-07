@@ -72,15 +72,11 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>ConsoleApplication1.Program</StartupObject>
+    <StartupObject>KiteBot.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Discord.Net, Version=0.8.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Discord.Net.0.8.1-beta2\lib\net45\Discord.Net.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Discord.Net.Commands, Version=0.8.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Discord.Net.Commands.0.8.1-beta2\lib\net45\Discord.Net.Commands.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -105,17 +101,48 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TextMarkovChainHelper.cs" />
+    <Compile Include="Properties\auth.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>auth.settings</DependentUpon>
+    </Compile>
+    <Compile Include="RandomHandler.cs" />
+    <Compile Include="TextMarkovChain.cs" />
+    <Compile Include="LivestreamChecker.cs" />
+    <Compile Include="KiteCoGame\Character.cs" />
+    <Compile Include="CryptoRandom.cs" />
+    <Compile Include="DiceRoller.cs" />
+    <Compile Include="KiteCoGame\KitCoGame.cs" />
+    <Compile Include="KiteChat.cs" />
+    <Compile Include="KitePizza.cs" />
+    <Compile Include="KiteSandwich.cs" />
+    <Compile Include="KiteCoGame\MapCell.cs" />
     <Compile Include="GiantBombRSS.cs" />
     <Compile Include="KiteDunk.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="Properties\auth.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>auth.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Example_auth.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Example_auth.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="KiteDunks2.txt" />
+    <Content Include="KiteCoGame\CharacterData.xml" />
+    <Content Include="Greetings.txt" />
+    <Content Include="KiteCoGame\RoomData.xml">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

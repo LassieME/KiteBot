@@ -3,7 +3,7 @@ using System.Timers;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
-namespace KiteBot
+namespace GiantBombBot
 {
     public class LivestreamChecker
 	{
@@ -61,7 +61,7 @@ namespace KiteBot
 		private XElement GetXDocumentFromUrl(string url)
 		{
             WebClient client = new WebClient();
-            client.Headers.Add("user-agent", "LassieMEKiteBot/0.9 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+            client.Headers.Add("user-agent", "Bot for fetching livestreams and new content for the GiantBomb Shifty Discord Server.");
             XDocument document = XDocument.Load(client.OpenRead(url));
 			return document.XPathSelectElement(@"//response");
 		}

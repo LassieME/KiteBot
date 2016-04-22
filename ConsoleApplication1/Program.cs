@@ -6,10 +6,9 @@ using Discord;
 using Discord.Commands;
 using Discord.Modules;
 using Newtonsoft.Json;
-using KiteBot.Commands;
 
 
-namespace KiteBot
+namespace GiantBombBot
 {
     class Program
     {
@@ -67,14 +66,13 @@ namespace KiteBot
                 : new JsonSettings("email",
                 "password", 
                 "Token", 
-                "GBAPIKey", 
-                true, 2, 60000, 60000);
+                "GBAPIKey",
+                60000, 
+                60000);
 
-            _kiteChat = new KiteChat(Settings.MarkovChainStart,
-                Settings.GiantBombApiKey,
+            _kiteChat = new KiteChat(Settings.GiantBombApiKey,
                 Settings.GiantBombLiveStreamRefreshRate,
-                Settings.GiantBombVideoRefreshRate, 
-                Settings.MarkovChainDepth);
+                Settings.GiantBombVideoRefreshRate);
 
             Client.AddService(new ModuleService());
             Client.UsingCommands(conf =>
@@ -84,27 +82,23 @@ namespace KiteBot
                 conf.PrefixChar = '.';
             });
 
-            Eval.RegisterEvalCommand(Client);
-
             //Event handlers
-            Client.UserIsTyping += async (s, e) => await Task.Run(delegate { _kiteChat.IsRaeTyping(e); });
-
             Client.MessageReceived += async (s, e) =>
             {
                 await _kiteChat.AsyncParseChat(s, e, Client);
             }; 
 
-            Client.ServerAvailable += async (s, e) =>
+            Client.ServerAvailable += (s, e) =>
             {
                 if (Client.Servers.Any())
                 {
-                    Console.WriteLine( await _kiteChat.InitializeMarkovChain());
+                    Console.WriteLine( e.Server.Name);
                 }
             };
             
             Client.JoinedServer += (s, e) =>
             {
-                Console.WriteLine("Connected to " + e.Server.Name);
+                Console.WriteLine("Connected to new server named " + e.Server.Name);
             };
 
             //Convert our sync method to an async one and block the Main function until the bot disconnects
@@ -146,7 +140,7 @@ namespace KiteBot
                 }
             });
         }
-
+        [Obsolete]
         public static void RssFeedSendMessage(object s, Feed.UpdatedFeedEventArgs e)
 	    {
 		    Client.GetChannel(85842104034541568).SendMessage(e.Title + " live now at GiantBomb.com\r\n" + e.Link);
@@ -160,19 +154,15 @@ namespace KiteBot
             public string GiantBombApiKey { get; set; }
             public ulong OwnerId { get; private set; }
 
-            public bool MarkovChainStart { get; set; }
-            public int MarkovChainDepth { get; set; }
             public int GiantBombVideoRefreshRate { get; set; }
             public int GiantBombLiveStreamRefreshRate { get; set; }
 
-            public JsonSettings(string email, string password, string token, string gbApi, bool markovChainStart,int markovChainDepth, int videoRefresh, int livestreamRefresh)
+            public JsonSettings(string email, string password, string token, string gbApi, int videoRefresh, int livestreamRefresh)
             {
                 DiscordEmail = email;
                 DiscordPassword = password;
                 DiscordToken = token;
                 GiantBombApiKey = gbApi;
-                MarkovChainStart = markovChainStart;
-                MarkovChainDepth = markovChainDepth;
                 GiantBombVideoRefreshRate = videoRefresh;
                 GiantBombLiveStreamRefreshRate = livestreamRefresh;
                 OwnerId = 85817630560108544;

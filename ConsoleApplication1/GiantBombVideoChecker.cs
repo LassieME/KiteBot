@@ -5,7 +5,7 @@ using System.Timers;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
-namespace KiteBot
+namespace GiantBombBot
 {
     public class GiantBombVideoChecker
 	{

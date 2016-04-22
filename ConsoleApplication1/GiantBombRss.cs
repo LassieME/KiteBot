@@ -5,8 +5,9 @@ using System.Timers;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
-namespace KiteBot
+namespace GiantBombBot
 {
+    [Obsolete]
 	public class GiantBombRss
 	{
 		private static readonly string[] GiantBombUrl = { "http://www.giantbomb.com/feeds/mashup/" };//,"http://www.giantbomb.com/feeds/podcast/", "http://www.giantbomb.com/podcast-xml/beastcast/", "http://www.giantbomb.com/feeds/video/

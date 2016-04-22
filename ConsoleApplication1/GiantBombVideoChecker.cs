@@ -12,11 +12,13 @@ namespace GiantBombBot
 		public static string ApiCallUrl;
 		private static Timer _chatTimer;//Garbage collection doesnt like local variables that only fire a couple times per hour
 		private XElement _latestXElement;
-        private DateTime lastPublishTime;
-        private bool firstTime = true;
+        private DateTime _lastPublishTime;
+        private bool _firstTime = true;
+        public int RefreshRate;
 
         public GiantBombVideoChecker(string GBapi,int streamRefresh)
         {
+            RefreshRate = streamRefresh;
             ApiCallUrl = "http://www.giantbomb.com/api/promos/?api_key=" + GBapi;
             _chatTimer = new Timer();
             _chatTimer.Elapsed += RefreshVideosApi;
@@ -38,11 +40,11 @@ namespace GiantBombBot
 		    foreach (XElement item in promos)
 		    {
                 DateTime newPublishTime = GetGiantBombFormatDateTime(item?.Element("date_added")?.Value);
-                if (newPublishTime.CompareTo(lastPublishTime) > 0)
+                if (newPublishTime.CompareTo(_lastPublishTime) > 0)
 		        {
-		            if (firstTime)
+		            if (_firstTime)
 		            {
-		                lastPublishTime = newPublishTime;
+		                _lastPublishTime = newPublishTime;
 		            }
 		            else
 		            {
@@ -50,13 +52,13 @@ namespace GiantBombBot
                         var deck = deGiantBombifyer(item?.Element("deck")?.Value);
                         var link = deGiantBombifyer(item?.Element("link")?.Value);
                         var user = deGiantBombifyer(item?.Element("user")?.Value);
-                        lastPublishTime = newPublishTime;
+                        _lastPublishTime = newPublishTime;
 
                         Program.Client.GetChannel(85842104034541568).SendMessage(title + ": " + deck + Environment.NewLine + "by: " + user + Environment.NewLine + link);
                     }
 		        }
 		    }
-            firstTime = false;
+            _firstTime = false;
         }
         private DateTime GetGiantBombFormatDateTime(string dateTimeString)
         {

@@ -3,8 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
-using Discord.Commands;
-using Discord.Modules;
 using Newtonsoft.Json;
 
 
@@ -61,8 +59,7 @@ namespace GiantBombBot
             //SetConsoleCtrlHandler(_handler, true);
 
             Client = new DiscordClient();
-            Settings = File.Exists(SettingsPath) ? 
-                JsonConvert.DeserializeObject<JsonSettings>(File.ReadAllText(SettingsPath)) 
+            Settings = File.Exists(SettingsPath) ? JsonConvert.DeserializeObject<JsonSettings>(File.ReadAllText(SettingsPath)) 
                 : new JsonSettings("email",
                 "password", 
                 "Token", 
@@ -70,17 +67,12 @@ namespace GiantBombBot
                 60000, 
                 60000);
 
+            if(!File.Exists(SettingsPath)) File.WriteAllText(SettingsPath,JsonConvert.SerializeObject(Settings,Formatting.Indented));
+
             _kiteChat = new KiteChat(Settings.GiantBombApiKey,
                 Settings.GiantBombLiveStreamRefreshRate,
                 Settings.GiantBombVideoRefreshRate);
 
-            Client.AddService(new ModuleService());
-            Client.UsingCommands(conf =>
-            {
-                conf.AllowMentionPrefix = true;
-                conf.HelpMode = HelpMode.Disabled;
-                conf.PrefixChar = '.';
-            });
 
             //Event handlers
             Client.MessageReceived += async (s, e) =>
@@ -92,13 +84,17 @@ namespace GiantBombBot
             {
                 if (Client.Servers.Any())
                 {
-                    Console.WriteLine( e.Server.Name);
+                    Console.WriteLine( e.Server.Name + "/" + e.Server.Id);
+                    foreach (Channel channel in e.Server.AllChannels)
+                    {
+                        Console.WriteLine($"\t\t-{channel.Name}/{channel.Id}");
+                    }
                 }
             };
             
             Client.JoinedServer += (s, e) =>
             {
-                Console.WriteLine("Connected to new server named " + e.Server.Name);
+                Console.WriteLine("Connected to new server named " + e.Server.Name +"/"+e.Server.Id);
             };
 
             //Convert our sync method to an async one and block the Main function until the bot disconnects
@@ -111,7 +107,7 @@ namespace GiantBombBot
                         if (Client.State.CompareTo(ConnectionState.Disconnected) == 0)
                         {
                             Console.WriteLine("Connecting...");
-                            if (Settings.DiscordEmail == null || Settings.DiscordPassword != null)
+                            if (Settings.DiscordEmail == null || Settings.DiscordPassword == null)
                             {
                                 await Client.Connect(Settings.DiscordToken);
 
@@ -135,6 +131,10 @@ namespace GiantBombBot
                         if (Client.State.CompareTo(ConnectionState.Connected) == 0)
                         {
                             Console.WriteLine("Connected.");
+                            //await
+                            //    Client.CurrentUser.Edit(
+                            //        avatar: new FileStream(@".\avatar.jpg", FileMode.Open, FileAccess.Read),
+                            //        avatarType: ImageType.Jpeg);
                         }
                     }
                 }
@@ -168,7 +168,7 @@ namespace GiantBombBot
                 OwnerId = 85817630560108544;
             }
 
-            internal void setOwner(ulong id)
+            internal void SetOwner(ulong id)
             {
                 OwnerId = id;
             }

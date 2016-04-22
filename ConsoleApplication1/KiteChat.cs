@@ -1,8 +1,6 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Net;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
 
@@ -19,12 +17,12 @@ namespace GiantBombBot
         {
         }
 
-        public KiteChat(string GBapi,int streamRefresh, int videoRefresh,Random randomSeed)
+        public KiteChat(string GBapi,int streamRefresh, int videoRefresh, Random randomSeed)
         {
             RandomSeed = randomSeed;
 
             StreamChecker = new LivestreamChecker(GBapi, streamRefresh);
-            GbVideoChecker = new GiantBombVideoChecker(GBapi, videoRefresh);
+            //GbVideoChecker = new GiantBombVideoChecker(GBapi, videoRefresh);
         }
 
         public async Task AsyncParseChat(object s, MessageEventArgs e, DiscordClient client)
@@ -94,7 +92,7 @@ namespace GiantBombBot
 		    client..OpenRead(url);*/
 
 		    HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
-            request.UserAgent = "LassieMEKiteBot/0.9 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)";
+            request.UserAgent = "Giant Bomb Discord bot fetching random quick looks";
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 			return response.ResponseUri.AbsoluteUri;
 		}

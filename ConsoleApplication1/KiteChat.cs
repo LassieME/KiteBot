@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Discord;
+using Discord.API.Client.Rest;
 
 namespace GiantBombBot
 {
@@ -12,6 +14,8 @@ namespace GiantBombBot
 
         public static LivestreamChecker StreamChecker;
         public static GiantBombVideoChecker GbVideoChecker;
+
+        public static List<Message> BotMessages = new List<Message>();
 
         public KiteChat(string GBapi, int streamRefresh, int videoRefresh) : this(GBapi, streamRefresh, videoRefresh, new Random())
         {
@@ -29,15 +33,27 @@ namespace GiantBombBot
         {
             Console.WriteLine("(" + e.User.Name + "/" + e.User.Id + ") - " + e.Message.Text);
 
-            //add all messages to the Markov Chain list
-
-            if (!e.Message.IsAuthor)
+            if (e.Message.IsAuthor)
             {
-                if (e.Message.Text.Contains(@"/saveExit") && e.User.Id == 85817630560108544)
+                BotMessages.Add(e.Message);
+            }
+            else if (!e.Message.IsAuthor)
+            {
+                if ( e.User.Id == 85817630560108544)
                 {
-
-                    await e.Channel.SendMessage("Done.");
-                    Environment.Exit(1);
+                    if (e.Message.Text.Contains(@"/saveExit"))
+                    {
+                        await e.Channel.SendMessage("OK");
+                        Environment.Exit(1);
+                    }
+                    else if (e.Message.Text.Contains(@"/update"))
+                    {
+                        await StreamChecker.ForceUpdateChannel();
+                    }
+                    else if (e.Message.Text.Contains("/delete"))
+                    {
+                        if (BotMessages.Any()) await BotMessages.Last().Delete();
+                    }
                 }
                 else if (e.Message.IsMentioningMe())
                 {
@@ -55,10 +71,9 @@ namespace GiantBombBot
                             "randomql" + nl + 
                             "help");
                     }
-                    else if (0 <= e.Message.Text.ToLower().IndexOf("randomql", 5))
+                    else if (e.Message.Text.ToLower().Contains("randomql"))
                     {
-                        await
-                            e.Channel.SendMessage(GetResponseUriFromRandomQlCrew());
+                        await e.Channel.SendMessage(GetResponseUriFromRandomQlCrew());
                     }
                     else if (e.Message.Text.ToLower().Contains("fuck you") || e.Message.Text.ToLower().Contains("fuckyou"))
                     {
@@ -76,8 +91,8 @@ namespace GiantBombBot
                     else
                     {
                         await
-                            e.Channel.SendMessage($"GiantBombBot ver. 0.1.1 \"Beastcast, best cast.\"\n" + 
-                            $"Made by <@{Program.Settings.OwnerId}> {e.Channel.GetUser(85817630560108544).Mention}.");
+                            e.Channel.SendMessage($"GiantBombBot ver. 0.1.2 \"Beastcast, Best cast.\"\n" + 
+                            $"Made by {e.Channel.GetUser(85817630560108544).Mention}.");
                     }
                 }
             }

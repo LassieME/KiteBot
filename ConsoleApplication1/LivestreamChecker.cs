@@ -14,18 +14,29 @@ namespace GiantBombBot
         public int RefreshRate;
 		private static Timer _chatTimer;//Garbage collection doesnt like local variables that only fire a couple times per hour
 		private XElement _latestXElement;
-		private bool _isStreamRunning;
+		private bool _wasStreamRunning;
         
 
-        public LivestreamChecker(string GBapi,int videoRefresh)
+        public LivestreamChecker(string gBapi,int videoRefresh)
         {
             RefreshRate = videoRefresh;
-            ApiCallUrl = "http://www.giantbomb.com/api/chats/?api_key=" + GBapi;
+            ApiCallUrl = "http://www.giantbomb.com/api/chats/?api_key=" + gBapi;
             _chatTimer = new Timer();
             _chatTimer.Elapsed += async (s,e) => await RefreshChatsApi();
             _chatTimer.Interval = videoRefresh;
             _chatTimer.AutoReset = true;
             _chatTimer.Enabled = true;
+        }
+
+        public async Task ForceUpdateChannel()
+        {
+            var temp = await GetXDocumentFromUrl(ApiCallUrl);
+            var stream = temp.Element("results").Element("stream");
+            var title = deGiantBombifyer(stream.Element("title").Value);
+            var deck = deGiantBombifyer(stream.Element("deck").Value);
+
+            await UpdateChannel("livesteam-live",
+                            $"Currently Live on Giant Bomb: {title}\n http://www.giantbomb.com/chat/");
         }
 
         private async Task RefreshChatsApi()
@@ -35,9 +46,9 @@ namespace GiantBombBot
                 _chatTimer.Stop();
                 _latestXElement = await GetXDocumentFromUrl(ApiCallUrl);
 
-                if (_isStreamRunning == false && !_latestXElement.Element("number_of_page_results").Value.Equals("0"))
+                if (_wasStreamRunning == false && !_latestXElement.Element("number_of_page_results").Value.Equals("0"))
                 {
-                    _isStreamRunning = true;
+                    _wasStreamRunning = true;
 
                     var stream = _latestXElement.Element("results").Element("stream");
                     var title = deGiantBombifyer(stream.Element("title").Value);
@@ -51,16 +62,16 @@ namespace GiantBombBot
                         UpdateChannel("livesteam-live",
                             $"Currently Live on Giant Bomb: {title}\n http://www.giantbomb.com/chat/");
                 }
-                else if (_isStreamRunning && _latestXElement.Element("number_of_page_results").Value.Equals("0"))
+                else if (_wasStreamRunning && _latestXElement.Element("number_of_page_results").Value.Equals("0"))
                 {
-                    _isStreamRunning = false;
+                    _wasStreamRunning = false;
                     await
                         Program.Client.GetChannel(106390533974294528)
                             .SendMessage("Show is over folks, if you need more Giant Bomb videos, check this out: " +
                                          KiteChat.GetResponseUriFromRandomQlCrew());
                     await
                         UpdateChannel("livesteam-offline",
-                            "Chat for live broadcasts.\nTODO: Add upcoming livestreams here.");
+                            $"Chat for live broadcasts.\nTODO: Add upcoming livestreams here.");
                 }
                 _chatTimer.Start();
             }

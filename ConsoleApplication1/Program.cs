@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -59,7 +58,11 @@ namespace GiantBombBot
             //_handler += Handler;
             //SetConsoleCtrlHandler(_handler, true);
 
-            Client = new DiscordClient();
+            Client = new DiscordClient(x =>
+            {
+                x.AppName = "ShiftGBot";
+                x.AppVersion = "0.1.1";
+            });
             Settings = File.Exists(SettingsPath) ? JsonConvert.DeserializeObject<JsonSettings>(File.ReadAllText(SettingsPath)) 
                 : new JsonSettings("email",
                 "password", 

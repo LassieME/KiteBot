@@ -35,7 +35,7 @@ namespace GiantBombBot
             var title = deGiantBombifyer(stream.Element("title").Value);
             var deck = deGiantBombifyer(stream.Element("deck").Value);
 
-            await UpdateChannel("livesteam-live",
+            await UpdateChannel("livestream-live",
                             $"Currently Live on Giant Bomb: {title}\n http://www.giantbomb.com/chat/");
         }
 
@@ -59,7 +59,7 @@ namespace GiantBombBot
                             .SendMessage(title + ": " + deck +
                                          " is LIVE at http://www.giantbomb.com/chat/ NOW, check it out!");
                     await
-                        UpdateChannel("livesteam-live",
+                        UpdateChannel("livestream-live",
                             $"Currently Live on Giant Bomb: {title}\n http://www.giantbomb.com/chat/");
                 }
                 else if (_wasStreamRunning && _latestXElement.Element("number_of_page_results").Value.Equals("0"))
@@ -70,7 +70,7 @@ namespace GiantBombBot
                             .SendMessage("Show is over folks, if you need more Giant Bomb videos, check this out: " +
                                          KiteChat.GetResponseUriFromRandomQlCrew());
                     await
-                        UpdateChannel("livesteam-offline",
+                        UpdateChannel("livestream-offline",
                             $"Chat for live broadcasts.\nTODO: Add upcoming livestreams here.");
                 }
                 _chatTimer.Start();

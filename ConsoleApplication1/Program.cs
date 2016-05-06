@@ -121,7 +121,7 @@ namespace GiantBombBot
                                 await Client.Connect(Settings.DiscordEmail, Settings.DiscordPassword);
                             }
 
-                            Client.SetGame("with Fury v1.1.0");
+                            Client.SetGame("WHY...");
                             break;
                         }
                     }

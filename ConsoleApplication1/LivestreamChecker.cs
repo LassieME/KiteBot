@@ -17,13 +17,13 @@ namespace GiantBombBot
 		private bool _wasStreamRunning;
         
 
-        public LivestreamChecker(string gBapi,int videoRefresh)
+        public LivestreamChecker(string gBapi,int streamRefresh)
         {
-            RefreshRate = videoRefresh;
+            RefreshRate = streamRefresh;
             ApiCallUrl = "http://www.giantbomb.com/api/chats/?api_key=" + gBapi;
             _chatTimer = new Timer();
             _chatTimer.Elapsed += async (s,e) => await RefreshChatsApi();
-            _chatTimer.Interval = videoRefresh;
+            _chatTimer.Interval = streamRefresh;
             _chatTimer.AutoReset = true;
             _chatTimer.Enabled = true;
         }

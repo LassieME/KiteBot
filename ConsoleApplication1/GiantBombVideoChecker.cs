@@ -16,13 +16,13 @@ namespace GiantBombBot
         private bool _firstTime = true;
         public int RefreshRate;
 
-        public GiantBombVideoChecker(string GBapi,int streamRefresh)
+        public GiantBombVideoChecker(string GBapi,int videoRefresh)
         {
-            RefreshRate = streamRefresh;
+            RefreshRate = videoRefresh;
             ApiCallUrl = "http://www.giantbomb.com/api/promos/?api_key=" + GBapi;
             _chatTimer = new Timer();
             _chatTimer.Elapsed += RefreshVideosApi;
-            _chatTimer.Interval = streamRefresh;
+            _chatTimer.Interval = videoRefresh;
             _chatTimer.AutoReset = true;
             _chatTimer.Enabled = true;
         }
@@ -80,7 +80,7 @@ namespace GiantBombBot
 		    try
 		    {
                 WebClient client = new WebClient();
-                client.Headers.Add("user-agent", "LassieMEKiteBot/0.9 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+                client.Headers.Add("user-agent", $"Bot for fetching livestreams and new content for the GiantBomb Shifty Discord Server. GETs every {RefreshRate/1000/60} minutes.");
                 XDocument document = XDocument.Load(client.OpenRead(url));
 		        return document.XPathSelectElement(@"//response");
 		    }

@@ -10,6 +10,7 @@ namespace GiantBombBot
     public class GiantBombVideoChecker
 	{
 		public static string ApiCallUrl;
+        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
 		private static Timer _chatTimer;//Garbage collection doesnt like local variables that only fire a couple times per hour
 		private XElement _latestXElement;
         private DateTime _lastPublishTime;
@@ -35,7 +36,6 @@ namespace GiantBombBot
 		private void RefreshVideosApi()
 		{
 		    _latestXElement = GetXDocumentFromUrl(ApiCallUrl);
-            var promo = _latestXElement.Element("results")?.Element("promo");
 		    var promos = _latestXElement.Element("results")?.Elements("promo");
 		    foreach (XElement item in promos)
 		    {

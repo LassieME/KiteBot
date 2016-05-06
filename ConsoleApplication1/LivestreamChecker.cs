@@ -70,7 +70,7 @@ namespace GiantBombBot
                             .SendMessage("Show is over folks, if you need more Giant Bomb videos, check this out: " +
                                          KiteChat.GetResponseUriFromRandomQlCrew());
                     await
-                        UpdateChannel("livestream-offline",
+                        UpdateChannel("livestream",
                             $"Chat for live broadcasts.\nTODO: Add upcoming livestreams here.");
                 }
                 _chatTimer.Start();

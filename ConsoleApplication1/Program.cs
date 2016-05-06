@@ -62,6 +62,7 @@ namespace GiantBombBot
             {
                 x.AppName = "ShiftGBot";
                 x.AppVersion = "0.1.1";
+                x.MessageCacheSize = 0;
             });
             Settings = File.Exists(SettingsPath) ? JsonConvert.DeserializeObject<JsonSettings>(File.ReadAllText(SettingsPath)) 
                 : new JsonSettings("email",

@@ -16,15 +16,15 @@ namespace GiantBombBot
 
         public static List<Message> BotMessages = new List<Message>();
 
-        public KiteChat(string GBapi, int streamRefresh, int videoRefresh) : this(GBapi, streamRefresh, videoRefresh, new Random())
+        public KiteChat(string giantBombapi, int streamRefresh, int videoRefresh) : this(giantBombapi, streamRefresh, videoRefresh, new Random())
         {
         }
 
-        public KiteChat(string GBapi,int streamRefresh, int videoRefresh, Random randomSeed)
+        public KiteChat(string giantBombapi, int streamRefresh, int videoRefresh, Random randomSeed)
         {
             RandomSeed = randomSeed;
 
-            StreamChecker = new LivestreamChecker(GBapi, streamRefresh);
+            StreamChecker = new LivestreamChecker(giantBombapi, streamRefresh);
             //GbVideoChecker = new GiantBombVideoChecker(GBapi, videoRefresh);
         }
 
@@ -106,6 +106,7 @@ namespace GiantBombBot
 		    client..OpenRead(url);*/
 
 		    HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
+            // ReSharper disable once PossibleNullReferenceException
             request.UserAgent = "Giant Bomb Discord bot fetching random quick looks";
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 			return response.ResponseUri.AbsoluteUri;

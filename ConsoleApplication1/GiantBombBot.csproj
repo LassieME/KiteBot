@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GiantBombBot</RootNamespace>
     <AssemblyName>GiantBombBot</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -102,19 +102,19 @@
   <ItemGroup>
     <Reference Include="Discord.Net, Version=0.9.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Discord.Net2\src\Discord.Net.Net45\bin\Debug\Discord.Net.dll</HintPath>
+      <HintPath>..\..\Discord.Net2\src\Discord.Net.Net45\bin\Release\Discord.Net.dll</HintPath>
     </Reference>
     <Reference Include="Discord.Net.Audio, Version=0.9.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Discord.Net2\src\Discord.Net.Audio.Net45\bin\Debug\Discord.Net.Audio.dll</HintPath>
+      <HintPath>..\..\Discord.Net2\src\Discord.Net.Audio.Net45\bin\Release\Discord.Net.Audio.dll</HintPath>
     </Reference>
     <Reference Include="Discord.Net.Commands, Version=0.9.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Discord.Net2\src\Discord.Net.Commands.Net45\bin\Debug\Discord.Net.Commands.dll</HintPath>
+      <HintPath>..\..\Discord.Net2\src\Discord.Net.Commands.Net45\bin\Release\Discord.Net.Commands.dll</HintPath>
     </Reference>
     <Reference Include="Discord.Net.Modules, Version=0.9.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Discord.Net2\src\Discord.Net.Modules.Net45\bin\Debug\Discord.Net.Modules.dll</HintPath>
+      <HintPath>..\..\Discord.Net2\src\Discord.Net.Modules.Net45\bin\Release\Discord.Net.Modules.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -133,7 +133,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RestSharp.105.2.3\lib\net45\RestSharp.dll</HintPath>
+      <HintPath>..\packages\RestSharp.105.2.3\lib\net452\RestSharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -154,6 +154,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

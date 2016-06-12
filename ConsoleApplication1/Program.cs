@@ -81,7 +81,8 @@ namespace GiantBombBot
 
             Client.UsingCommands(x => {
                 x.PrefixChar = '!';
-                x.HelpMode = HelpMode.Public;
+                x.AllowMentionPrefix = true;
+                x.HelpMode = HelpMode.Private;
             });
 
             Commands.Game.RegisterGameCommand(Client,Settings.GiantBombApiKey);

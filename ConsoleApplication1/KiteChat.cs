@@ -105,11 +105,7 @@ namespace GiantBombBot
 		{
             string url = "http://qlcrew.com/main.php?anyone=anyone&inc%5B0%5D=&p=999&exc%5B0%5D=&per_page=15&random";
 
-            /*WebClient client = new WebClient();
-            client.Headers.Add("user-agent", "LassieMEKiteBot/0.9 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
-		    client..OpenRead(url);*/
-
-		    HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
+            HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
             // ReSharper disable once PossibleNullReferenceException
             request.UserAgent = "Giant Bomb Discord bot fetching random quick looks";
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();

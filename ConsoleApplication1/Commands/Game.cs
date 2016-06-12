@@ -5,7 +5,6 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using Discord;
 using Discord.Commands;
-using Newtonsoft.Json;
 
 namespace GiantBombBot.Commands
 {
@@ -18,7 +17,7 @@ namespace GiantBombBot.Commands
         {
             ApiCallUrl =
                 $"http://www.giantbomb.com/api/games/?api_key={gBapi}&field_list=deck,image,name,original_release_date,platforms,site_detail_url&filter=name:";
-            client.Services.Get<CommandService>().CreateCommand("game") //create command greet
+            client.GetService<CommandService>().CreateCommand("game") //create command greet
                     .Alias("games","giantbomb") //add 2 aliases, so it can be run with ~gr and ~hi
                     .Description("Gets the first game with the given name or alias from the GiantBomb games api endpoint") //add description, it will be shown when ~help is used
                     .Parameter("GameTitle", ParameterType.Unparsed) //as an argument, we have a person we want to greet
@@ -34,7 +33,6 @@ namespace GiantBombBot.Commands
                         {
                             await e.Channel.SendMessage($"Empty game name given, please spesify a game title");
                         }
-                        //await e.Channel.SendMessage($"{e.User.Name} sucks. {e.GetArg("GameTitle")}");
                     });
         }
 

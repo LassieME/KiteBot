@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
+using Discord.Commands;
 using Newtonsoft.Json;
 
 
@@ -78,6 +79,12 @@ namespace GiantBombBot
                 Settings.GiantBombLiveStreamRefreshRate,
                 Settings.GiantBombVideoRefreshRate);
 
+            Client.UsingCommands(x => {
+                x.PrefixChar = '!';
+                x.HelpMode = HelpMode.Public;
+            });
+
+            Commands.Game.RegisterGameCommand(Client,Settings.GiantBombApiKey);
 
             //Event handlers
             Client.MessageReceived += async (s, e) =>
@@ -115,7 +122,6 @@ namespace GiantBombBot
                             if (Settings.DiscordEmail == null || Settings.DiscordPassword == null)
                             {
                                 await Client.Connect(Settings.DiscordToken);
-
                             }
                             else
                             {

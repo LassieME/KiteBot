@@ -53,6 +53,10 @@ namespace GiantBombBot
                     {
                         if (BotMessages.Any()) await BotMessages.Last().Delete();
                     }
+                    else if (e.Message.Text.Contains(@"/restart"))
+                    {
+                        StreamChecker.Restart();
+                    }
                 }
                 else if (e.Message.IsMentioningMe())
                 {
@@ -77,14 +81,14 @@ namespace GiantBombBot
                     else if (e.Message.Text.ToLower().Contains("fuck you") || e.Message.Text.ToLower().Contains("fuckyou"))
                     {
                         List<string> _possibleResponses = new List<string>();
-                        _possibleResponses.Add("Hey fuck you too USER!");
-                        _possibleResponses.Add("I bet you'd like that wouldn't you USER?");
-                        _possibleResponses.Add("No, fuck you USER!");
-                        _possibleResponses.Add("Fuck you too USER!");
+                        _possibleResponses.Add("Hey fuck you too &USER!");
+                        _possibleResponses.Add("I bet you'd like that wouldn't you &USER?");
+                        _possibleResponses.Add("No, fuck you &USER!");
+                        _possibleResponses.Add("Fuck you too &USER!");
 
                         await
                             e.Channel.SendMessage(
-                                _possibleResponses[RandomSeed.Next(0, _possibleResponses.Count)].Replace("USER",
+                                _possibleResponses[RandomSeed.Next(0, _possibleResponses.Count)].Replace("&USER",
                                     e.User.Name));
                     }
                     else

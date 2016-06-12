@@ -12,7 +12,7 @@ namespace GiantBombBot
     {
         public static string ApiCallUrl;
         public int RefreshRate;
-        private static Timer _chatTimer;//Garbage collection doesnt like local variables that only fire a couple times per hour
+        private static Timer _chatTimer;//Garbage collection...
         private XElement _latestXElement;
         private bool _wasStreamRunning;
         private int _retry;
@@ -20,7 +20,7 @@ namespace GiantBombBot
 
         public LivestreamChecker(string gBapi, int streamRefresh)
         {
-            if (gBapi.Length > 0 && streamRefresh > 3000)
+            if (streamRefresh > 3000)
             {
                 ApiCallUrl = $"http://www.giantbomb.com/api/chats/?api_key={gBapi}&field_list=date_added,deck,title";
                 RefreshRate = streamRefresh;
@@ -32,12 +32,30 @@ namespace GiantBombBot
             }
         }
 
+        public void Restart()
+        {
+            if (_chatTimer == null)
+            {
+                Console.WriteLine("_chatTimer eaten by GC");
+                Environment.Exit(-1);
+            }
+            else if (_chatTimer.Enabled == false)
+            {
+                Console.WriteLine("Was off, turning LiveStream back on.");
+                _chatTimer.Start();
+                if (_chatTimer.AutoReset == false)
+                {
+                    Console.WriteLine("AutoReset was off");
+                    _chatTimer.AutoReset = true;
+                }
+            }
+        }
+
         public async Task ForceUpdateChannel()
         {
             var temp = await GetXDocumentFromUrl(ApiCallUrl);
             var stream = temp.Element("results")?.Element("stream");
             var title = deGiantBombifyer(stream?.Element("title")?.Value);
-            //var deck = deGiantBombifyer(stream?.Element("deck")?.Value);
 
             await UpdateChannel("livestream-live",
                             $"Currently Live on Giant Bomb: {title}\n http://www.giantbomb.com/chat/");
@@ -45,7 +63,6 @@ namespace GiantBombBot
 
         private async Task RefreshChatsApi()
         {
-            _chatTimer.Stop();
             try
             {
                 if (Program.Client.Servers.Any())
@@ -102,10 +119,6 @@ namespace GiantBombBot
                     .Users.FirstOrDefault(x => x.Id == 85817630560108544);
                 if (owner != null)
                     await owner.SendMessage($"LivestreamChecker threw an {ex.GetType()}, check the logs").ConfigureAwait(false);
-            }
-            finally
-            {
-                _chatTimer.Start();
             }
         }
 

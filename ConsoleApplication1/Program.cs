@@ -56,15 +56,13 @@ namespace GiantBombBot
 
         private static void Main()
         {
-            //_handler += Handler;
-            //SetConsoleCtrlHandler(_handler, true);
-
             Client = new DiscordClient(x =>
             {
                 x.AppName = "ShiftGBot";
-                x.AppVersion = "0.1.1";
+                x.AppVersion = "0.2.0";
                 x.MessageCacheSize = 0;
             });
+
             Settings = File.Exists(SettingsPath) ? JsonConvert.DeserializeObject<JsonSettings>(File.ReadAllText(SettingsPath)) 
                 : new JsonSettings("email",
                 "password", 
@@ -77,16 +75,20 @@ namespace GiantBombBot
 
             _kiteChat = new KiteChat(Settings.GiantBombApiKey,
                 Settings.GiantBombLiveStreamRefreshRate,
-                Settings.GiantBombVideoRefreshRate);
+                Settings.GiantBombVideoRefreshRate,
+                90000);
 
             Client.UsingCommands(x => {
-                x.PrefixChar = '!';
+                x.PrefixChar = '~';
+                x.HelpMode = HelpMode.Public;
                 x.AllowMentionPrefix = true;
-                x.HelpMode = HelpMode.Private;
             });
 
-            Commands.Game.RegisterGameCommand(Client,Settings.GiantBombApiKey);
+            Commands.Game.RegisterGameCommand(Client, Settings.GiantBombApiKey);
+            Commands.Admin.RegisterAdminCommands(Client);
+            Commands.Misc.RegisterMiscCommands(Client);
 
+            
             //Event handlers
             Client.MessageReceived += async (s, e) =>
             {
@@ -122,7 +124,7 @@ namespace GiantBombBot
                             Console.WriteLine("Connecting...");
                             if (Settings.DiscordEmail == null || Settings.DiscordPassword == null)
                             {
-                                await Client.Connect(Settings.DiscordToken);
+                                await Client.Connect(Settings.DiscordToken,TokenType.Bot);
                             }
                             else
                             {
@@ -152,11 +154,6 @@ namespace GiantBombBot
                 }
             });
         }
-        [Obsolete]
-        public static void RssFeedSendMessage(object s, Feed.UpdatedFeedEventArgs e)
-	    {
-		    Client.GetChannel(85842104034541568).SendMessage(e.Title + " live now at GiantBomb.com\r\n" + e.Link);
-	    }
 
         public struct JsonSettings
         {
@@ -177,7 +174,8 @@ namespace GiantBombBot
                 GiantBombApiKey = gbApi;
                 GiantBombVideoRefreshRate = videoRefresh;
                 GiantBombLiveStreamRefreshRate = livestreamRefresh;
-                OwnerId = 85817630560108544;
+                OwnerId = 85817630560108544; //85817630560108544
+
             }
 
             internal void SetOwner(ulong id)

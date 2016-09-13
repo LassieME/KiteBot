@@ -32,29 +32,34 @@ namespace GiantBombBot
             }
         }
 
-        public void Restart()
+        public string Restart()
         {
+            string s = "";
             if (_chatTimer == null)
             {
-                Console.WriteLine("_chatTimer eaten by GC");
+                Console.WriteLine("_chatTimer eaten by GC");                
                 Environment.Exit(-1);
             }
             else if (_chatTimer.Enabled == false)
             {
                 Console.WriteLine("Was off, turning LiveStream back on.");
+                s += "Was off, turning LiveStream back on.";
                 _chatTimer.Start();
                 if (_chatTimer.AutoReset == false)
                 {
                     Console.WriteLine("AutoReset was off");
+                    s += Environment.NewLine + "AutoReset was off";
                     _chatTimer.AutoReset = true;
                 }
+                return s;
             }
+            return s;
         }
 
         public async Task ForceUpdateChannel()
         {
             var temp = await GetXDocumentFromUrl(ApiCallUrl);
-            var stream = temp.Element("results")?.Element("stream");
+            var stream = temp.Element("results")?.Elements("stream").LastOrDefault();
             var title = deGiantBombifyer(stream?.Element("title")?.Value);
 
             await UpdateChannel("livestream-live",
@@ -71,9 +76,9 @@ namespace GiantBombBot
                     {
                         _retry = 0;
                         _latestXElement = await GetXDocumentFromUrl(ApiCallUrl).ConfigureAwait(false);
-                        var numberOfResults = _latestXElement.Element("number_of_page_results");
+                        var numberOfResults = _latestXElement.Element("number_of_page_results").Value;
 
-                        if (numberOfResults != null && _wasStreamRunning == false && !numberOfResults.Value.Equals("0"))
+                        if (_wasStreamRunning == false && !numberOfResults.Equals("0"))
                         {
                             _wasStreamRunning = true;
 
@@ -86,12 +91,13 @@ namespace GiantBombBot
                                     .SendMessage(title + ": " + deck +
                                                  " is LIVE at http://www.giantbomb.com/chat/ NOW, check it out!")
                                     .ConfigureAwait(false);
+                            
                             await
                                 UpdateChannel("livestream-live",
                                     $"Currently Live on Giant Bomb: {title}\n http://www.giantbomb.com/chat/")
                                     .ConfigureAwait(false);
                         }
-                        else if (numberOfResults != null && _wasStreamRunning && numberOfResults.Value.Equals("0"))
+                        else if (_wasStreamRunning && numberOfResults.Equals("0"))
                         {
                             _wasStreamRunning = false;
                             await

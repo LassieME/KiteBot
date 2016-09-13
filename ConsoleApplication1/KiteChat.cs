@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using Discord;
+using System.Net;
 
 namespace GiantBombBot
 {
@@ -13,19 +12,21 @@ namespace GiantBombBot
 
         public static LivestreamChecker StreamChecker;
         public static GiantBombVideoChecker GbVideoChecker;
+        //public static MixlrChecker MixlrChecker;
 
         public static List<Message> BotMessages = new List<Message>();
 
-        public KiteChat(string giantBombapi, int streamRefresh, int videoRefresh) : this(giantBombapi, streamRefresh, videoRefresh, new Random())
+        public KiteChat(string giantBombapi, int streamRefresh, int videoRefresh, int mixlrRefresh) : this(giantBombapi, streamRefresh, videoRefresh, mixlrRefresh, new Random())
         {
         }
 
-        public KiteChat(string giantBombapi, int streamRefresh, int videoRefresh, Random randomSeed)
+        public KiteChat(string giantBombapi, int streamRefresh, int videoRefresh, int mixlrRefresh, Random randomSeed)
         {
             RandomSeed = randomSeed;
 
             StreamChecker = new LivestreamChecker(giantBombapi, streamRefresh);
             //GbVideoChecker = new GiantBombVideoChecker(GBapi, videoRefresh);
+            //MixlrChecker = new MixlrChecker(mixlrRefresh);
         }
 
         public async Task AsyncParseChat(object s, MessageEventArgs e, DiscordClient client)
@@ -38,47 +39,9 @@ namespace GiantBombBot
             }
             else if (!e.Message.IsAuthor)
             {
-                if ( e.User.Id == 85817630560108544)
-                {
-                    if (e.Message.Text.Contains(@"/saveExit"))
-                    {
-                        await e.Channel.SendMessage("OK");
-                        Environment.Exit(1);
-                    }
-                    else if (e.Message.Text.Contains(@"/update"))
-                    {
-                        await StreamChecker.ForceUpdateChannel();
-                    }
-                    else if (e.Message.Text.Contains("/delete"))
-                    {
-                        if (BotMessages.Any()) await BotMessages.Last().Delete();
-                    }
-                    else if (e.Message.Text.Contains(@"/restart"))
-                    {
-                        StreamChecker.Restart();
-                    }
-                }
-                else if (e.Message.IsMentioningMe())
-                {
-                    if (e.Message.Text.StartsWith("@KiteBot #420") ||
-                        e.Message.Text.ToLower().StartsWith("@KiteBot #blaze") ||
-                        0 <= e.Message.Text.ToLower().IndexOf("waifu", 0))
-                    {
-                        await e.Channel.SendMessage("http://420.moe/");
-                    }
-                    else if (0 <= e.Message.Text.ToLower().IndexOf("help", 5))
-                    {
-                        var nl = Environment.NewLine;
-                        await e.Channel.SendMessage("Current Commands are:" + nl + 
-                            "#420"+ nl + 
-                            "randomql" + nl + 
-                            "help");
-                    }
-                    else if (e.Message.Text.ToLower().Contains("randomql"))
-                    {
-                        await e.Channel.SendMessage(GetResponseUriFromRandomQlCrew());
-                    }
-                    else if (e.Message.Text.ToLower().Contains("fuck you") || e.Message.Text.ToLower().Contains("fuckyou"))
+                 if (e.Message.IsMentioningMe())
+                {                                       
+                    if (e.Message.Text.ToLower().Contains("fuck you") || e.Message.Text.ToLower().Contains("fuckyou"))
                     {
                         List<string> _possibleResponses = new List<string>();
                         _possibleResponses.Add("Hey fuck you too &USER!");
@@ -94,7 +57,8 @@ namespace GiantBombBot
                     else
                     {
                         await
-                            e.Channel.SendMessage($"GiantBombBot ver. 0.1.2 \"Beastcast, Best cast.\"\n" + 
+                            e.Channel.SendMessage($"GiantBombBot ver. 0.2.0 \"Beastcast, Best cast.\"" + Environment.NewLine + 
+                            "use !help" +
                             $"Made by {e.Channel.GetUser(85817630560108544).Mention}.");
                     }
                 }
@@ -102,14 +66,14 @@ namespace GiantBombBot
         }
 
         public static string GetResponseUriFromRandomQlCrew()
-		{
+        {
             string url = "http://qlcrew.com/main.php?anyone=anyone&inc%5B0%5D=&p=999&exc%5B0%5D=&per_page=15&random";
 
             HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
             // ReSharper disable once PossibleNullReferenceException
             request.UserAgent = "Giant Bomb Discord bot fetching random quick looks";
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-			return response.ResponseUri.AbsoluteUri;
-		}
+            return response.ResponseUri.AbsoluteUri;
+        }
     }
 }

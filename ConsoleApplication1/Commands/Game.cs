@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -15,12 +16,14 @@ namespace GiantBombBot.Commands
 
         public static void RegisterGameCommand(DiscordClient client, string gBapi)
         {
+            Console.WriteLine("Registering Game Command");
             ApiCallUrl =
                 $"http://www.giantbomb.com/api/games/?api_key={gBapi}&field_list=deck,image,name,original_release_date,platforms,site_detail_url&filter=name:";
-            client.GetService<CommandService>().CreateCommand("game") //create command greet
-                    .Alias("games","giantbomb") //add 2 aliases, so it can be run with ~gr and ~hi
-                    .Description("Gets the first game with the given name or alias from the GiantBomb games api endpoint") //add description, it will be shown when ~help is used
-                    .Parameter("GameTitle", ParameterType.Unparsed) //as an argument, we have a person we want to greet
+
+            client.GetService<CommandService>().CreateCommand("game")
+                    .Alias("games", "videogame", "videogames")
+                    .Description("Gets the first game with the given name or alias from the GiantBomb games api endpoint")
+                    .Parameter("GameTitle", ParameterType.Unparsed) //as an argument, rest of the message without the command
                     .Do(async e =>
                     {
                         var args = e.GetArg("GameTitle");
@@ -31,10 +34,11 @@ namespace GiantBombBot.Commands
                         }
                         else
                         {
-                            await e.Channel.SendMessage($"Empty game name given, please spesify a game title");
+                            await e.Channel.SendMessage($"Empty game name given, please specify a game title");
                         }
                     });
-        }
+            //.AddCheck((c, u, ch) => u.Id == 85817630560108544)
+    }
 
         private static async Task<string> GetGamesEndpoint(string gameTitle)
         {
@@ -42,36 +46,38 @@ namespace GiantBombBot.Commands
             try
             {
                 var document = await GetXDocumentFromUrl(ApiCallUrl + gameTitle);
-                
+
                 var firstResult = document.Element("results")?.Element("game");
                 if (firstResult != null)
                 {
-                    string site_detail_url = firstResult.Element(@"site_detail_url").Value;
-                    string original_release_date = firstResult.Element(@"original_release_date").Value;
-                    string name = firstResult.Element(@"name").Value;
+                    string site_detail_url = firstResult.Element(@"site_detail_url")?.Value;
+                    string original_release_date = firstResult.Element(@"original_release_date")?.Value;
+                    string name = firstResult.Element(@"name")?.Value;
                     string platforms = "";
-                    string deck = firstResult.Element(@"deck").Value;
-                    string super_url = firstResult.Element(@"image").Element("super_url").Value;
+                    string deck = firstResult.Element(@"deck")?.Value;
+                    string small_url = firstResult.Element(@"image")?.Element("small_url")?.Value;
 
-                    foreach (var element in firstResult.Elements(@"platforms"))
+                    var collection = firstResult.Element(@"platforms")?.Elements(@"platform");
+
+                    foreach (var element in collection)
                     {
-                        if (platforms.Equals(String.Empty))
+                        if (platforms.Equals(string.Empty))
                         {
-                            platforms += element.Element("platform").Element("name").Value;
+                            platforms += element.Element("name").Value;
                         }
                         else
                         {
-                            platforms += ", " + element.Element("platform").Element("name").Value;
+                            platforms += ", " + element.Element("name").Value;
                         }
                     }
                     platforms += ".";
                     GameResult gameResult = new GameResult(site_detail_url, original_release_date, name, platforms, deck,
-                        super_url);
+                        small_url);
                     output = gameResult.ToString();
                 }
                 else
                 {
-                    output = "Something bad happened. Try again later";
+                    output = "Couldn't find a game with that name. Try again later";
                 }
             }
             catch (Exception ex)
@@ -111,6 +117,7 @@ namespace GiantBombBot.Commands
             return s.Replace("<![CDATA[ ", "").Replace(" ]]>", "");
         }
     }
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class GameResult
     {
         public GameResult(string siteDetailUrl, string originalReleaseDate, string title, string gamingPlatforms, string deck1, string superUrl)
@@ -120,7 +127,7 @@ namespace GiantBombBot.Commands
             name = title;
             platforms = gamingPlatforms;
             deck = deck1;
-            super_url = superUrl;
+            small_url = superUrl;
         }
 
         public string site_detail_url { get; set; }
@@ -128,7 +135,7 @@ namespace GiantBombBot.Commands
         public string name { get; set; }
         public string platforms { get; set; }
         public string deck { get; set; }
-        public string super_url { get; set; }
+        public string small_url { get; set; }
 
         public override string ToString() =>
             "`Title:` **" + name +
@@ -136,6 +143,6 @@ namespace GiantBombBot.Commands
             "\n`Release Date:` " + original_release_date +
             "\n`Platforms:` " + platforms +
             "\n`Link:` " + site_detail_url +
-            "\n`img:` " + super_url;
+            "\n`img:` " + small_url;
     }
 }

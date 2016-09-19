@@ -18,11 +18,11 @@ namespace GiantBombBot.Commands
         {
             Console.WriteLine("Registering Game Command");
             ApiCallUrl =
-                $"http://www.giantbomb.com/api/games/?api_key={gBapi}&field_list=deck,image,name,original_release_date,platforms,site_detail_url&filter=name:";
+                $"http://www.giantbomb.com/api/search/?api_key={gBapi}&field_list=deck,image,name,original_release_date,platforms,site_detail_url&query=";
 
             client.GetService<CommandService>().CreateCommand("game")
-                    .Alias("games", "videogame", "videogames")
-                    .Description("Gets the first game with the given name or alias from the GiantBomb games api endpoint")
+                    .Alias("games", "videogame","gamesearch")
+                    .Description("Searches the Giantbomb.com videogame database api.")
                     .Parameter("GameTitle", ParameterType.Unparsed) //as an argument, rest of the message without the command
                     .Do(async e =>
                     {

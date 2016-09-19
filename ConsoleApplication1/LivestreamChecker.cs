@@ -59,11 +59,20 @@ namespace GiantBombBot
         public async Task ForceUpdateChannel()
         {
             var temp = await GetXDocumentFromUrl(ApiCallUrl);
-            var stream = temp.Element("results")?.Elements("stream").LastOrDefault();
-            var title = deGiantBombifyer(stream?.Element("title")?.Value);
+            var numberOfResults = temp.Element("number_of_page_results").Value;
+            if (numberOfResults.Equals("0"))
+            {
+                await UpdateChannel("livestream",
+                    "Chat for live broadcasts.\nTODO: Add upcoming livestreams here.");
+            }
+            else
+            {
+                var stream = temp.Element("results")?.Elements("stream").LastOrDefault();
+                var title = deGiantBombifyer(stream?.Element("title")?.Value);
 
-            await UpdateChannel("livestream-live",
-                            $"Currently Live on Giant Bomb: {title}\n http://www.giantbomb.com/chat/");
+                await UpdateChannel("livestream-live",
+                                $"Currently Live on Giant Bomb: {title}\n http://www.giantbomb.com/chat/");
+            }
         }
 
         private async Task RefreshChatsApi()

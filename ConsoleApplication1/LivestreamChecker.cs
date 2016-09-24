@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Newtonsoft.Json;
 
 namespace GiantBombBot
 {
@@ -17,12 +20,18 @@ namespace GiantBombBot
         private bool _wasStreamRunning;
         private int _retry;
 
+        public static string ContentDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent?.Parent?.FullName;
+        private static string IgnoreFilePath => ContentDirectory + "/Content/ignoredChannels.json";
+
+        private readonly List<string> _ignoreList = File.Exists(IgnoreFilePath) ? JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(IgnoreFilePath)) 
+                : new List<string>();
+
 
         public LivestreamChecker(string gBapi, int streamRefresh)
         {
             if (streamRefresh > 3000)
             {
-                ApiCallUrl = $"http://www.giantbomb.com/api/chats/?api_key={gBapi}&field_list=date_added,deck,title";
+                ApiCallUrl = $"http://www.giantbomb.com/api/chats/?api_key={gBapi}&field_list=date_added,deck,title,channel_name";
                 RefreshRate = streamRefresh;
                 _chatTimer = new Timer();
                 _chatTimer.Elapsed += async (s, e) => await RefreshChatsApi();
@@ -37,7 +46,7 @@ namespace GiantBombBot
             string s = "";
             if (_chatTimer == null)
             {
-                Console.WriteLine("_chatTimer eaten by GC");                
+                Console.WriteLine("_chatTimer eaten by GC");
                 Environment.Exit(-1);
             }
             else if (_chatTimer.Enabled == false)
@@ -87,26 +96,27 @@ namespace GiantBombBot
                         _latestXElement = await GetXDocumentFromUrl(ApiCallUrl).ConfigureAwait(false);
                         var numberOfResults = _latestXElement.Element("number_of_page_results").Value;
 
-                        if (_wasStreamRunning == false && !numberOfResults.Equals("0"))
+                        var stream = _latestXElement.Element("results")?.Elements("stream").FirstOrDefault(x => !_ignoreList.Contains(x.Element("channel_name")?.Value));
+
+                        if (_wasStreamRunning == false && !numberOfResults.Equals("0") && stream != null)
                         {
                             _wasStreamRunning = true;
 
-                            var stream = _latestXElement.Element("results")?.Element("stream");
                             var title = deGiantBombifyer(stream?.Element("title")?.Value);
                             var deck = deGiantBombifyer(stream?.Element("deck")?.Value);
 
                             await
                                 Program.Client.GetChannel(106390533974294528)
                                     .SendMessage(title + ": " + deck +
-                                                 " is LIVE at http://www.giantbomb.com/chat/ NOW, check it out!")
-                                    .ConfigureAwait(false);
-                            
+                                        " is LIVE at http://www.giantbomb.com/chat/ NOW, check it out!")
+                                            .ConfigureAwait(false);
                             await
                                 UpdateChannel("livestream-live",
-                                    $"Currently Live on Giant Bomb: {title}\n http://www.giantbomb.com/chat/")
+                                        $"Currently Live on Giant Bomb: {title}\n http://www.giantbomb.com/chat/")
                                     .ConfigureAwait(false);
+
                         }
-                        else if (_wasStreamRunning && numberOfResults.Equals("0"))
+                        else if (_wasStreamRunning && (numberOfResults.Equals("0") || stream == null ))
                         {
                             _wasStreamRunning = false;
                             await
@@ -149,7 +159,7 @@ namespace GiantBombBot
                 using (WebClient client = new WebClient())
                 {
                     client.Headers.Add("user-agent",
-                        $"Bot for fetching livestreams and new content for the GiantBomb Shifty Discord Server. GETs every {RefreshRate/1000/60} minutes.");
+                        $"Bot for fetching livestreams and new content for the GiantBomb Shifty Discord Server. GETs every {RefreshRate / 1000 / 60} minutes.");
                     XDocument document = XDocument.Load(await client.OpenReadTaskAsync(url).ConfigureAwait(false));
                     return document.XPathSelectElement(@"//response");
                 }
@@ -177,6 +187,24 @@ namespace GiantBombBot
             {
                 Console.WriteLine("Couldn't change Channel name");
             }
+        }
+
+        public void IgnoreChannel(string args)
+        {
+            _ignoreList.Add(args);
+            File.WriteAllText(IgnoreFilePath, JsonConvert.SerializeObject(_ignoreList));
+        }
+
+        public async Task<string> ListChannels()
+        {
+            var xElement = await GetXDocumentFromUrl(ApiCallUrl).ConfigureAwait(false);
+            var streams = xElement.Element("results")?.Elements("stream");
+            var output = "";
+            foreach (var stream in streams)
+            {
+                output += stream.Element("channel_name")?.Value + Environment.NewLine;
+            }
+            return output;
         }
     }
 }

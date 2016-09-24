@@ -88,7 +88,12 @@ namespace GiantBombBot
             Commands.Admin.RegisterAdminCommands(Client);
             Commands.Misc.RegisterMiscCommands(Client);
 
-            
+            var os = "";
+            foreach (var i in Client.GetService<CommandService>().AllCommands)
+            {
+                os += i.Text + Environment.NewLine;
+            }
+            Console.WriteLine(os);
             //Event handlers
             Client.MessageReceived += async (s, e) =>
             {

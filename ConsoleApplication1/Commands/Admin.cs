@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 
@@ -56,6 +53,26 @@ namespace GiantBombBot.Commands
                         await e.Channel.SendMessage(s);
                     });
 
+            client.GetService<CommandService>().CreateCommand("ignore")
+                    .Parameter("channelName", ParameterType.Unparsed) //as an argument, rest of the message without the command
+                    .Description("ignore a gb chat channelname")
+                    .Hide()
+                    .AddCheck((c, u, ch) => u.Id == 85817630560108544)
+                    .Do(async e =>
+                    {
+                        var args = e.GetArg("channelName");
+                        KiteChat.StreamChecker.IgnoreChannel(args);
+                        await e.Channel.SendMessage("Added to ignore list.");
+                    });
+
+            client.GetService<CommandService>().CreateCommand("listchannels")
+                    .Description("Lists names of GB chats")
+                    .Hide()
+                    .AddCheck((c, u, ch) => u.Id == 85817630560108544)
+                    .Do(async e =>
+                    {
+                        await e.Channel.SendMessage(await KiteChat.StreamChecker.ListChannels());
+                    });
         }
     }
 }

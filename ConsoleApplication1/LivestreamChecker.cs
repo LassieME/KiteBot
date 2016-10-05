@@ -74,7 +74,7 @@ namespace GiantBombBot
             {
                 var nextLiveStream = (await Upcoming.TestDownload()).upcoming.FirstOrDefault(x => x.Type == "Live Show");
                 await UpdateChannel("livestream",
-                    $"Chat for live broadcasts.\nUpcoming livestream: {(nextLiveStream != null ? nextLiveStream.Title + " on " + nextLiveStream.Date + " PDT." + Environment.NewLine : "No upcoming livestream.")}");
+                    $"Chat for live broadcasts.\nUpcoming livestream: {(nextLiveStream != null ? nextLiveStream.Title + " on " + nextLiveStream.Date + " PST." + Environment.NewLine : "No upcoming livestream.")}");
             }
             else
             {
@@ -132,7 +132,7 @@ namespace GiantBombBot
 
                             var nextLiveStream = (await Upcoming.TestDownload()).upcoming.FirstOrDefault(x => x.Type == "Live Show");
                             await UpdateChannel("livestream",
-                                $"Chat for live broadcasts.\nUpcoming livestream: {(nextLiveStream != null ? nextLiveStream.Title + " on " + nextLiveStream.Date + " PDT." + Environment.NewLine : "No upcoming livestream.")}");
+                                $"Chat for live broadcasts.\nUpcoming livestream: {(nextLiveStream != null ? nextLiveStream.Title + " on " + nextLiveStream.Date + " PST." + Environment.NewLine : "No upcoming livestream.")}");
                         }
 
                     }

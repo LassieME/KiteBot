@@ -50,7 +50,7 @@ namespace GiantBombBot
 
         public static DiscordClient Client;
         public static JsonSettings Settings;
-        private static KiteChat _kiteChat;
+        public static KiteChat KiteChat;
         public static string ContentDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent?.Parent?.FullName;
         private static string SettingsPath => ContentDirectory + "/Content/settings.json";
 
@@ -73,7 +73,7 @@ namespace GiantBombBot
 
             if(!File.Exists(SettingsPath)) File.WriteAllText(SettingsPath,JsonConvert.SerializeObject(Settings,Formatting.Indented));
 
-            _kiteChat = new KiteChat(Settings.GiantBombApiKey,
+            KiteChat = new KiteChat(Settings.GiantBombApiKey,
                 Settings.GiantBombLiveStreamRefreshRate,
                 Settings.GiantBombVideoRefreshRate,
                 90000);
@@ -87,6 +87,8 @@ namespace GiantBombBot
             Commands.Game.RegisterGameCommand(Client, Settings.GiantBombApiKey);
             Commands.Admin.RegisterAdminCommands(Client);
             Commands.Misc.RegisterMiscCommands(Client);
+            Commands.Subscribe.RegisterSubscribeCommands(Client);
+            Commands.Upcoming.RegisterUpcomingCommand(Client);
 
             var os = "";
             foreach (var i in Client.GetService<CommandService>().AllCommands)
@@ -97,7 +99,7 @@ namespace GiantBombBot
             //Event handlers
             Client.MessageReceived += async (s, e) =>
             {
-                await _kiteChat.AsyncParseChat(s, e, Client);
+                await KiteChat.AsyncParseChat(s, e, Client);
             }; 
 
             Client.ServerAvailable += (s, e) =>

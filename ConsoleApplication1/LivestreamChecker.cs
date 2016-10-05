@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using GiantBombBot.Commands;
 using Newtonsoft.Json;
 
 namespace GiantBombBot
@@ -23,7 +24,7 @@ namespace GiantBombBot
         public static string ContentDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent?.Parent?.FullName;
         private static string IgnoreFilePath => ContentDirectory + "/Content/ignoredChannels.json";
 
-        private readonly List<string> _ignoreList = File.Exists(IgnoreFilePath) ? JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(IgnoreFilePath)) 
+        private readonly List<string> _ignoreList = File.Exists(IgnoreFilePath) ? JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(IgnoreFilePath))
                 : new List<string>();
 
 
@@ -31,7 +32,7 @@ namespace GiantBombBot
         {
             if (streamRefresh > 3000)
             {
-                ApiCallUrl = $"http://www.giantbomb.com/api/chats/?api_key={gBapi}&field_list=date_added,deck,title,channel_name";
+                ApiCallUrl = $"http://www.giantbomb.com/api/chats/?api_key={gBapi}&field_list=date_added,deck,title,channel_name,image";
                 RefreshRate = streamRefresh;
                 _chatTimer = new Timer();
                 _chatTimer.Elapsed += async (s, e) => await RefreshChatsApi();
@@ -71,8 +72,9 @@ namespace GiantBombBot
             var numberOfResults = temp.Element("number_of_page_results").Value;
             if (numberOfResults.Equals("0"))
             {
+                var nextLiveStream = (await Upcoming.TestDownload()).upcoming.FirstOrDefault(x => x.Type == "Live Show");
                 await UpdateChannel("livestream",
-                    "Chat for live broadcasts.\nTODO: Add upcoming livestreams here.");
+                    $"Chat for live broadcasts.\nUpcoming livestream: {(nextLiveStream != null ? nextLiveStream.Title + " on " + nextLiveStream.Date + " PDT." + Environment.NewLine : "No upcoming livestream.")}");
             }
             else
             {
@@ -94,29 +96,32 @@ namespace GiantBombBot
                     {
                         _retry = 0;
                         _latestXElement = await GetXDocumentFromUrl(ApiCallUrl).ConfigureAwait(false);
-                        var numberOfResults = _latestXElement.Element("number_of_page_results").Value;
+                        var numberOfResults = _latestXElement.Element("number_of_page_results")?.Value;
 
                         var stream = _latestXElement.Element("results")?.Elements("stream").FirstOrDefault(x => !_ignoreList.Contains(x.Element("channel_name")?.Value));
 
                         if (_wasStreamRunning == false && !numberOfResults.Equals("0") && stream != null)
                         {
                             _wasStreamRunning = true;
+                            var subscriptionTask = Subscribe.PostLivestream(stream);
 
-                            var title = deGiantBombifyer(stream?.Element("title")?.Value);
-                            var deck = deGiantBombifyer(stream?.Element("deck")?.Value);
+                            var title = deGiantBombifyer(stream.Element("title")?.Value);
+                            var deck = deGiantBombifyer(stream.Element("deck")?.Value);
+                            var image = deGiantBombifyer(stream.Element("image")?.Element("screen_url")?.Value);
 
                             await
                                 Program.Client.GetChannel(106390533974294528)
                                     .SendMessage(title + ": " + deck +
-                                        " is LIVE at http://www.giantbomb.com/chat/ NOW, check it out!")
+                                        " is LIVE at <http://www.giantbomb.com/chat/> NOW, check it out!" + Environment.NewLine + image)
                                             .ConfigureAwait(false);
                             await
                                 UpdateChannel("livestream-live",
                                         $"Currently Live on Giant Bomb: {title}\n http://www.giantbomb.com/chat/")
                                     .ConfigureAwait(false);
 
+                            await subscriptionTask;
                         }
-                        else if (_wasStreamRunning && (numberOfResults.Equals("0") || stream == null ))
+                        else if (_wasStreamRunning && (numberOfResults.Equals("0") || stream == null))
                         {
                             _wasStreamRunning = false;
                             await
@@ -124,10 +129,10 @@ namespace GiantBombBot
                                     .SendMessage(
                                         "Show is over folks, if you need more Giant Bomb videos, check this out: " +
                                         KiteChat.GetResponseUriFromRandomQlCrew()).ConfigureAwait(false);
-                            await
-                                UpdateChannel("livestream",
-                                    "Chat for live broadcasts.\nTODO: Add upcoming livestreams here.")
-                                    .ConfigureAwait(false);
+
+                            var nextLiveStream = (await Upcoming.TestDownload()).upcoming.FirstOrDefault(x => x.Type == "Live Show");
+                            await UpdateChannel("livestream",
+                                $"Chat for live broadcasts.\nUpcoming livestream: {(nextLiveStream != null ? nextLiveStream.Title + " on " + nextLiveStream.Date + " PDT." + Environment.NewLine : "No upcoming livestream.")}");
                         }
 
                     }
@@ -205,6 +210,11 @@ namespace GiantBombBot
                 output += stream.Element("channel_name")?.Value + Environment.NewLine;
             }
             return output;
+        }
+
+        public class AlarmEventArgs : EventArgs
+        {
+            public XElement XElement;
         }
     }
 }

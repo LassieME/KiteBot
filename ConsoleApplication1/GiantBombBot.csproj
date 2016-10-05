@@ -167,6 +167,8 @@
     <Compile Include="Commands\Admin.cs" />
     <Compile Include="Commands\Game.cs" />
     <Compile Include="Commands\Misc.cs" />
+    <Compile Include="Commands\Subscribe.cs" />
+    <Compile Include="Commands\Upcoming.cs" />
     <Compile Include="GiantBombVideoChecker.cs" />
     <Compile Include="LivestreamChecker.cs" />
     <Compile Include="KiteChat.cs" />
